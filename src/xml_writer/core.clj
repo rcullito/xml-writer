@@ -5,7 +5,8 @@
             [clojure.data.xml :as xml]
             [clojure.string :as str])
   (:import (javax.xml.stream XMLStreamWriter XMLOutputFactory)
-           (java.io StringWriter Writer)))
+           (java.io StringWriter Writer)
+           (com.ctc.wstx.api InvalidCharHandler$ReplacingHandler)))
 
 
 (set! *warn-on-reflection* true)
@@ -58,7 +59,8 @@
 (defn encode-sexp [sexp ^Writer writer & {:as opts}]
   "Encodes a given sexp into a given Writer."
   (let [factory                 (doto (XMLOutputFactory/newInstance)
-                                  (.setProperty com.ctc.wstx.api.WstxOutputProperties/P_AUTOMATIC_END_ELEMENTS false))
+                                  (.setProperty com.ctc.wstx.api.WstxOutputProperties/P_AUTOMATIC_END_ELEMENTS false)
+                                  (.setProperty com.ctc.wstx.api.WstxOutputProperties/P_OUTPUT_INVALID_CHAR_HANDLER (InvalidCharHandler$ReplacingHandler. (char \space))))
         ^XMLStreamWriter writer (.createXMLStreamWriter factory writer)]
     (.writeStartDocument writer (or (:encoding opts) "UTF-8") "1.0")
     (emit! sexp writer)
@@ -71,3 +73,8 @@
   (let [^StringWriter writer (StringWriter.)]
     (encode-sexp sexp writer)
     (.toString writer)))
+
+;; repl test of offending expression
+;; (emit-sexp-str [:root [:child {:attribute "value"} "Some text\u001Cmore text"]])
+
+
