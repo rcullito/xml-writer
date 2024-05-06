@@ -1,4 +1,4 @@
-(defproject xml-writer "0.2.0"
+(defproject com.github.rcullito/xml-writer "0.3.0"
   :description "Fast-ish XML serialization"
   :url "http://github.com/bpoweski/xml-writer"
   :license {:name "Eclipse Public License"
