@@ -7,6 +7,7 @@
   (:import (javax.xml.stream XMLStreamWriter XMLOutputFactory)
            (java.io StringWriter Writer)
            (com.ctc.wstx.api InvalidCharHandler$ReplacingHandler InvalidCharHandler$FailingHandler)
+           (com.ctc.wstx.stax WstxOutputFactory)
            (com.github.bpoweski ReplaceInvalidWhitespace)))
 
 
@@ -71,8 +72,8 @@
 (defn encode-sexp
   "Encodes a given sexp into a given Writer."
   [sexp ^Writer writer & {:as opts}]
-  (let [factory                 (set-woodstox-properties opts)
-        ^XMLStreamWriter writer (.createXMLStreamWriter factory writer)]
+  (let [^WstxOutputFactory factory (set-woodstox-properties opts)
+        ^XMLStreamWriter writer    (.createXMLStreamWriter factory writer)]
     (.writeStartDocument writer (or (:encoding opts) "UTF-8") "1.0")
     (emit! sexp writer)
     (.writeEndDocument writer)
